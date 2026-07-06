@@ -1,15 +1,63 @@
 classDiagram
-    %% Replace the placeholders below with your actual classes, attributes, methods, and relationships.
-    %% Keep this file updated so it matches your final implementation.
-
-    class ClassName {
-        +type attribute
-        +method() returnType
+    class Owner {
+        +str name
+        +int available_minutes
+        +time day_start
+        +bool prefer_shorter_tasks_when_tied
+        +__post_init__() None
     }
 
-    class AnotherClass {
-        +type attribute
-        +method() returnType
+    class Pet {
+        +str name
+        +str species
+        +__post_init__() None
     }
 
-    ClassName --> AnotherClass : relationship
+    class CareTask {
+        +str title
+        +int duration_minutes
+        +str priority
+        +str notes
+        +priority_score int
+        +__post_init__() None
+    }
+
+    class ScheduledItem {
+        +CareTask task
+        +datetime start
+        +datetime end
+        +str reason
+        +time_range str
+    }
+
+    class SkippedTask {
+        +CareTask task
+        +str reason
+    }
+
+    class DailyPlan {
+        +Owner owner
+        +Pet pet
+        +list scheduled_items
+        +list skipped_tasks
+        +total_scheduled_minutes int
+        +remaining_minutes int
+        +as_rows() list
+    }
+
+    class Scheduler {
+        +sort_tasks(tasks, owner) list
+        +build_daily_plan(owner, pet, tasks) DailyPlan
+        -_reason_for_scheduled_task(task) str
+    }
+
+    Owner --> DailyPlan : owns available time
+    Pet --> DailyPlan : receives care
+    CareTask --> ScheduledItem : scheduled as
+    CareTask --> SkippedTask : skipped as
+    DailyPlan o-- ScheduledItem : includes
+    DailyPlan o-- SkippedTask : records
+    Scheduler ..> Owner : reads constraints
+    Scheduler ..> Pet : labels plan
+    Scheduler ..> CareTask : sorts and filters
+    Scheduler --> DailyPlan : builds
